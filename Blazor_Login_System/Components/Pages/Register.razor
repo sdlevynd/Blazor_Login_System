@@ -1,0 +1,59 @@
+﻿@page "/register"
+@using Blazor_Login_System.Data
+@using Blazor_Login_System.Utilities
+@inject Blazor_Login_System.Services.UserService UserService
+@inject NavigationManager NavigationManager
+
+
+@rendermode InteractiveServer
+
+<h3>Register New User</h3>
+
+<EditForm Model="newUser" OnValidSubmit="HandleValidSubmit" FormName="testForm">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div>
+        <label>Username:</label>
+        <InputText @bind-Value="newUser.userName" />
+    </div>
+
+    <div>
+        <label>Password:</label>
+        <InputText @bind-Value="password" type="password" />
+    </div>
+
+    <div>
+        <label>First Name:</label>
+        <InputText @bind-Value="newUser.firstName" />
+    </div>
+
+    <div>
+        <label>Last Name:</label>
+        <InputText @bind-Value="newUser.lastName" />
+    </div>
+
+    <div>
+        <label>Email Address:</label>
+        <InputText @bind-Value="newUser.emailAddress" />
+    </div>
+
+    <button type="submit">Register</button>
+</EditForm>
+
+@code {
+    private User newUser = new User();
+    private string password;
+
+    private async Task HandleValidSubmit()
+    {
+        // Hash the password using SHA256
+        newUser.password = PasswordHasher.HashPassword(password);
+
+        // Insert the user into the database
+        await UserService.AddUserAsync(newUser);
+        newUser = new User();
+        password = "";
+        NavigationManager.NavigateTo("");
+    }
+}
